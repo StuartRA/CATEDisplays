@@ -8,7 +8,7 @@ utils::globalVariables("..density..")
 utils::globalVariables("lowerinterval")
 utils::globalVariables("upperinterval")
 
-## Function: subgroupCATE()
+#' subgroupCATE
 
 #' Takes a dataset augmented with individual CATE estimates and visualizes tau.hat distribution (CATE + CI)
 #' grouped by specified subgroups to assess HTE.

@@ -1,7 +1,7 @@
 utils::globalVariables("study")
 utils::globalVariables("dfList")
 
-## Wrapper function: cateDiffs()
+#' cateDiffs
 
 #' Estimates CATE using causal forests with data from multiple trials
 #' and carries out multiple treatment effect heterogeneity diagnostics by subgroup.
@@ -56,11 +56,11 @@ cateDiffs <- function(dfList,
     dfviz$study <- df$study
 
     # 2. Produce CATE estimates figures, all studies:
-    tauHat <- getTauHatFig(dfviz, combine=T)
+    tauHat <- vizTauHat(dfviz, combine=T)
     subgroupCATE <- subgroupCATE(dfviz, outCol, txCol, covList, combine=T)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blpF <- getBLPfig(res, combine=T)
+    blpF <- vizBLP(res, combine=T)
 
   } else{
 
@@ -85,11 +85,11 @@ cateDiffs <- function(dfList,
     df[,txCol] <- df$tx
 
     # 2. Produce CATE estimates figures, all studies:
-    tauHat <- getTauHatFig(df, combine=F)
+    tauHat <- vizTauHat(df, combine=F)
     subgroupCATE <- subgroupCATE(df, outCol, txCol, covList, combine=F)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blpF <- getBLPfig(res, combine=F)
+    blpF <- vizBLP(res, combine=F)
 
   }
 
