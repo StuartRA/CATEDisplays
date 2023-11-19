@@ -1,0 +1,28 @@
+Package: CATEDisplays
+Title: Assess and display Conditional Average Treatment Effects
+Version: 0.0.1
+Date: 2023-11-16
+Authors@R: c(
+    person("Elena", "Badillo-Goicoechea", , "egoicoe1@jh.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "")),
+    person("Ryoko", "Susukida", , "rsuskida@jh.edu", role = "aut",
+           comment = c(ORCID = "")),
+    person("Elizabeth", "Stuart", , "estuart1@jh.edu",role = "aut",
+           comment = c(ORCID = ""))
+  )
+Description: CATEDisplays is an R package designed to seamlessly: 1) estimate conditional average treatment effect (CATE) coming from one or more sites and/or trials; 2) test for treatment effect heterogeneity; 3) visualize results. This package is mainly designed for researchers evaluating evidence coming from multiple trials and interested in potentially differential treatments effects across different subpopulations.
+Imports: grf, dplyr, ggplot2, stats, jtools, sjlabelled, plyr, data.table, cowplot
+License: GPL (>=3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+LazyData: true
+RoxygenNote: 7.2.3
+Depends: R (>= 2.10)
+Suggests: knitr, rmarkdown, devtools
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2023-11-16 16:56:39 UTC; r1707404
+Author: Elena Badillo-Goicoechea [aut, cre],
+  Ryoko Susukida [aut],
+  Elizabeth Stuart [aut]
+Maintainer: Elena Badillo-Goicoechea <egoicoe1@jh.edu>
