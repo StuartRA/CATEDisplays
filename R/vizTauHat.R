@@ -8,8 +8,10 @@ utils::globalVariables("row_number")
 utils::globalVariables("lowerinterval")
 utils::globalVariables("upperinterval")
 
+#' @title
 #' vizTauHat
 
+#' @description
 #' Takes a dataset augmented with individual CATE estimates and visualizes overall tau.hat distribution (CATE + CI) .
 #'
 #'

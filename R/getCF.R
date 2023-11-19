@@ -1,7 +1,9 @@
 utils::globalVariables("qnorm")
 
+#' @title
 #' getCF
-
+#'
+#' @description
 #'  Takes dataframe list from multople trials and: 1) estimates CATE using causal forest;
 #'  2) Estimates overall ATE; 3) Tests for (agnostic) treatment effect heterogeneity
 #'  4) Computes the best linear projection* of CATE of user-provided covariates and visually displays resulting coefficients;

@@ -1,8 +1,10 @@
 utils::globalVariables("study")
 utils::globalVariables("dfList")
 
+#' @title
 #' cateDiffs
 
+#' @description
 #' Estimates CATE using causal forests with data from multiple trials
 #' and carries out multiple treatment effect heterogeneity diagnostics by subgroup.
 #'

@@ -19,8 +19,10 @@ theme_MH <- ggplot2::theme(plot.subtitle = ggplot2::element_text(size = ggplot2:
                                                vjust = 0),
                   axis.title.x = ggplot2::element_text(angle = 0))
 
+#' @title
 #' vizBLP
 
+#' @description
 #' Takes the best linear projection* of the CATE as a function
 #'  of of user-provided covariates and visually displays resulting coefficients.
 #' * Let tau(Xi) = E(Y(1) - Y(0) | X = Xi) be the CATE, and Ai be a vector of user-provided covariates.
