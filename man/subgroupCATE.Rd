@@ -2,7 +2,8 @@
 % Please edit documentation in R/subgroupCATE.R
 \name{subgroupCATE}
 \alias{subgroupCATE}
-\title{Takes a dataset augmented with individual CATE estimates and visualizes tau.hat distribution (CATE + CI)
+\title{subgroupCATE
+Takes a dataset augmented with individual CATE estimates and visualizes tau.hat distribution (CATE + CI)
 grouped by specified subgroups to assess HTE.}
 \usage{
 subgroupCATE(cfdf, outCol, txCol, covList, combine)
@@ -24,6 +25,7 @@ subgroupCATE(cfdf, outCol, txCol, covList, combine)
 list; list of ggplot objects; figure with individual CATE estimate visualizations by subgroup
 }
 \description{
+subgroupCATE
 Takes a dataset augmented with individual CATE estimates and visualizes tau.hat distribution (CATE + CI)
 grouped by specified subgroups to assess HTE.
 }
