@@ -1,5 +1,5 @@
 # CATEDisplays
-R package to assess HTE
+An R package to assess and display Conditional Average Treatment Effects (CATE).
 
 CATEDisplays is a new R package designed to seamlessly:
 1) Estimate conditional average treatment effect (CATE) coming from one or more sites and/or trials.
