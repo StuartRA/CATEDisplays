@@ -4,7 +4,7 @@ utils::globalVariables("dfList")
 ## Wrapper function: cateDiffs()
 
 #' Estimates CATE using causal forests with data from multiple trials
-#' and carries out multiple treatment effect heterogeneity diagnostics by subgroup
+#' and carries out multiple treatment effect heterogeneity diagnostics by subgroup.
 #'
 #' @export
 #' @param dfList list; a list of dataframes, one per trial
@@ -26,7 +26,8 @@ cateDiffs <- function(dfList,
                       combine=FALSE,
                       ci=0.95, nTrees=10000, seedN=7203){
 
-
+  if(class(dfList) != "list"){
+    dfList <- as.list(dfList) }
 
   # 1. Run main function for each study:
 
@@ -41,12 +42,6 @@ cateDiffs <- function(dfList,
       dfi$study <- as.factor(paste0("Study", i))
       df <- plyr::rbind.fill(df, dfi)
     }
-
-    # df <- stats::na.omit(dplyr::select(df,
-    #                                    c(txCol,
-    #                                      outCol,
-    #                                      study, covList,
-    #                                      blpredList)))
 
     res <- getCF(df,
                  outCol,
@@ -88,8 +83,6 @@ cateDiffs <- function(dfList,
 
     df[,outCol] <- df$Y
     df[,txCol] <- df$tx
-
-    #df <- stats::na.omit(df)
 
     # 2. Produce CATE estimates figures, all studies:
     tauHat <- getTauHatFig(df, combine=F)
