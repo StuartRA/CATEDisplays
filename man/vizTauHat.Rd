@@ -2,8 +2,7 @@
 % Please edit documentation in R/vizTauHat.R
 \name{vizTauHat}
 \alias{vizTauHat}
-\title{vizTauHat
-Takes a dataset augmented with individual CATE estimates and visualizes overall tau.hat distribution (CATE + CI) .}
+\title{vizTauHat}
 \usage{
 vizTauHat(cfdf, combine)
 }
@@ -14,6 +13,5 @@ vizTauHat(cfdf, combine)
 ggplot object; figure with individual CATE estimate visualizations
 }
 \description{
-vizTauHat
 Takes a dataset augmented with individual CATE estimates and visualizes overall tau.hat distribution (CATE + CI) .
 }

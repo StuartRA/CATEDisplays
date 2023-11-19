@@ -2,13 +2,7 @@
 % Please edit documentation in R/vizBLP.R
 \name{vizBLP}
 \alias{vizBLP}
-\title{vizBLP
-Takes the best linear projection* of the CATE as a function
-of of user-provided covariates and visually displays resulting coefficients.
-\itemize{
-\item Let tau(Xi) = E(Y(1) - Y(0) | X = Xi) be the CATE, and Ai be a vector of user-provided covariates.
-This function provides a (doubly robust) fit to the linear model tau(Xi) ~ beta_0 + Ai * beta."
-}}
+\title{vizBLP}
 \usage{
 vizBLP(res, combine)
 }
@@ -21,7 +15,6 @@ vizBLP(res, combine)
 ggplot object; figure with model results
 }
 \description{
-vizBLP
 Takes the best linear projection* of the CATE as a function
 of of user-provided covariates and visually displays resulting coefficients.
 \itemize{

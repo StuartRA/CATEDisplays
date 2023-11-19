@@ -2,9 +2,7 @@
 % Please edit documentation in R/cateDiffs.R
 \name{cateDiffs}
 \alias{cateDiffs}
-\title{cateDiffs
-Estimates CATE using causal forests with data from multiple trials
-and carries out multiple treatment effect heterogeneity diagnostics by subgroup.}
+\title{cateDiffs}
 \usage{
 cateDiffs(
   dfList,
@@ -41,7 +39,6 @@ cateDiffs(
 list with: 1) , 2),  3)
 }
 \description{
-cateDiffs
 Estimates CATE using causal forests with data from multiple trials
 and carries out multiple treatment effect heterogeneity diagnostics by subgroup.
 }

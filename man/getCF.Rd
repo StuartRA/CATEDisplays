@@ -2,11 +2,7 @@
 % Please edit documentation in R/getCF.R
 \name{getCF}
 \alias{getCF}
-\title{getCF
-Takes dataframe list from multople trials and: 1) estimates CATE using causal forest;
-2) Estimates overall ATE; 3) Tests for (agnostic) treatment effect heterogeneity
-4) Computes the best linear projection* of CATE of user-provided covariates and visually displays resulting coefficients;
-5) Augments original datasets with CATE + CI.}
+\title{getCF}
 \usage{
 getCF(stdf, outCol, txCol, covList, blpredList, combine, ci, nTrees, seedN)
 }
@@ -33,6 +29,10 @@ getCF(stdf, outCol, txCol, covList, blpredList, combine, ci, nTrees, seedN)
 list with: 1) , 2),  3)
 }
 \description{
+Takes dataframe list from multople trials and: 1) estimates CATE using causal forest;
+2) Estimates overall ATE; 3) Tests for (agnostic) treatment effect heterogeneity
+4) Computes the best linear projection* of CATE of user-provided covariates and visually displays resulting coefficients;
+5) Augments original datasets with CATE + CI.
 \itemize{
 \item Let tau(Xi) = E(Y(1) - Y(0) | X = Xi) be the CATE, and Ai be a vector of user-provided covariates.
 This function provides a (doubly robust) fit to the linear model tau(Xi) ~ beta_0 + Ai * beta."
