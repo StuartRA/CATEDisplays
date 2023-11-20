@@ -68,13 +68,14 @@ vizBLP <- function(res, combine) {
       ggplot2::xlab("") +
       ggplot2::theme(
         axis.text.y = ggplot2::element_blank(),
-      ) }else{
+      ) } else{
 
         blpList <- res$BLP
 
         blps <- jtools::plot_summs(blpList,
                                    point.shape = FALSE)
         dfg <- blps$data
+
         dfg$study <- dfg$model
 
         ### Visualize:

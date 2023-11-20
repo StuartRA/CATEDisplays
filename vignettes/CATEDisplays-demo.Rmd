@@ -211,7 +211,7 @@ catesDisplay$vizSubgroupCATE
 
 3. Best linear projection:
 ```{r, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
-catesDisplay$vizBLP
+catesDisplay$vizblp
 ```
 
 
@@ -273,7 +273,7 @@ catesDisplayCombined$vizSubgroupCATE
 
 3. Best linear projection:
 ```{r, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
-catesDisplayCombined$vizBLP
+catesDisplayCombined$vizblp
 ```
 
 

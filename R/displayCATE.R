@@ -101,14 +101,14 @@ displayCATE <- function(dfList,
     vizSubgroupCATE <- subgroupCATE(df, outCol, txCol, covList, combine=F)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    vizBLP <- vizBLP(res, combine=F)
+    vizblp <- vizBLP(res, combine=F)
 
   }
 
   return(list(cateOutput=res,
               vizTauHat=vizTauHat,
               vizSubgroupCATE=vizSubgroupCATE,
-              vizBLP=vizBLP
+              vizblp=vizblp
               )
   )
 }
