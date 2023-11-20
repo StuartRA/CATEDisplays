@@ -11,8 +11,8 @@ if(!require(devtools)){
     install.packages("devtools", repos = "http://cran.us.r-project.org")
 }
 
-if(!require(CATEDisplays )){
-    devtools::install_github("StuartRA/CATEDisplays ")
+if(!require(CATEDisplays)){
+devtools::install_github("StuartRA/CATEDisplays")
 }
 
 
@@ -35,11 +35,11 @@ df4$sex <- as.factor(sample(c('Male', 'Female'), 350, replace=TRUE))
 df5$sex <- as.factor(sample(c('Male', 'Female'), 150, replace=TRUE))
 
 ## ---- results='asis'----------------------------------------------------------
-df1$Age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df2$Age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df3$Age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df4$Age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df5$Age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df1$age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df2$age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df3$age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df4$age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df5$age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
 
 ## ---- results='asis'----------------------------------------------------------
 df1$educ <- as.factor(sample(c('Less than HS', 'HS', 'College', 'Graduate'), 250, replace=TRUE))
@@ -78,4 +78,30 @@ df5$tx <- sample(c(1, 0), 150, replace=TRUE, prob = c(0.45, 0.55))
 
 ## ---- results='asis'----------------------------------------------------------
 dfList <- list(df1, df2, df3, df4, df5)
+
+## ---- results='asis'----------------------------------------------------------
+catesDisplay <- CATEDisplays::displayCATE(dfList,
+                           outCol="outc",
+                           txCol="tx",
+                           covList= c("age", "race", "educ", "sex", "ASIalc"),
+                           blpredList=NULL,
+                           combine=F,
+                           verbose=T,
+                           ci=0.95, nTrees=10000, seedN=7203)
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+studyNum = 2
+cateOutput <- catesDisplay$cateOutput[[studyNum]]
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$ATE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$testHTE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+head(cateOutput$cateDF, 5)
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$BLP
 

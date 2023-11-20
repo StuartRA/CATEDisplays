@@ -347,7 +347,7 @@ Stuart</strong></p>
 <p>2023-11-19</p>
 </div>
 <div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<h2>1. Introduction</h2>
 <p>Personalized treatment decisions, which hold great potential for
 improving health outcomes for patients of varying characteristics,
 involve the assessment and estimation of individualized or conditional
@@ -369,10 +369,10 @@ seamlessly:</p>
 one or more sites and/or trials</li>
 <li>Combine data from multiple trials (optionally).</li>
 <li>Test for the presence of treatment effect heterogeneity, using
-multiple diagnostics, including agnostic test for hetergeneity,
+multiple diagnostics, including agnostic test for heterogeneity (see ),
 distribution of the CATE by subgroups of interest with confidence
 intervals, and a doubly robust best linear projection of the CATE,
-provided user-specified covariates.</li>
+provided user-specified covariates and/or predictors.</li>
 <li>Visualize results</li>
 </ol>
 <p>Overall, the procedure This package is mainly designed for
@@ -389,22 +389,24 @@ included in the documentation, which the reader is encouraged to
 consult, if necessary.</p>
 </div>
 <div id="package-and-data-set-up" class="section level2">
-<h2>Package and data set up</h2>
-<p>First, if needed, install the sitepickR package with the help of
+<h2>2. Package and data set-up</h2>
+<p>First, if needed, install the CATEDisplays package with the help of
 devtools:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(devtools)){</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="fu">install.packages</span>(<span class="st">&quot;devtools&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;http://cran.us.r-project.org&quot;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>}</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(CATEDisplays )){</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;StuartRA/CATEDisplays &quot;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    }</span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(CATEDisplays)){</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;StuartRA/CATEDisplays&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>}</span></code></pre></div>
 <p>And load the package by calling its library:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(CATEDisplays)</span></code></pre></div>
-<p>Now let’s generate a dataset that satisfies the following basic
-structure (required for the package to run seamlessly):</p>
+<p>Now let’s generate a simple dataset for 5 trials that satisfies the
+following basic structure (required for the package to run
+seamlessly):</p>
 <ol style="list-style-type: decimal">
-<li>One dataframe per study/trial</li>
+<li>One dataframe per study/trial, with varying sample sizes (250, 50,
+450, 350, 150)</li>
 <li>If more than one study or trial is included, all the specified
 covariates of interest (e.g. demographics) must be available for each
 study/trial and coded in the same manner.</li>
@@ -449,100 +451,225 @@ Index”):</p>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>df3<span class="sc">$</span>ASIalc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">450</span>, <span class="dv">0</span>, <span class="fl">0.15</span>)</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>df4<span class="sc">$</span>ASIalc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">350</span>, <span class="dv">0</span>, <span class="fl">0.25</span>)</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>df5<span class="sc">$</span>ASIalc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">150</span>, <span class="dv">0</span>, <span class="fl">0.35</span>)</span></code></pre></div>
-<p>Generate continuous outcome variable:</p>
+<p>Generate a continuous outcome variable:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>df1<span class="sc">$</span>outc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">250</span>, <span class="fl">0.6</span>, <span class="fl">0.75</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>df2<span class="sc">$</span>outc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">50</span>, <span class="fl">0.6</span>, <span class="fl">0.75</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>df3<span class="sc">$</span>outc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">450</span>, <span class="fl">0.6</span>, <span class="fl">0.75</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>df4<span class="sc">$</span>outc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">350</span>, <span class="fl">0.6</span>, <span class="fl">0.75</span>)</span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>df5<span class="sc">$</span>outc <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">150</span>, <span class="fl">0.6</span>, <span class="fl">0.75</span>)</span></code></pre></div>
-<p>Generate binary treatment assignment variable:</p>
+<p>Generate a binary treatment assignment variable:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>df1<span class="sc">$</span>tx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">250</span>, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>df2<span class="sc">$</span>tx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">50</span>, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>df3<span class="sc">$</span>tx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">450</span>, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob =</span><span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.7</span>))</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>df4<span class="sc">$</span>tx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">350</span>, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>df5<span class="sc">$</span>tx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">150</span>, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.45</span>, <span class="fl">0.55</span>))</span></code></pre></div>
-<p>Put single trial dataframes into a list:</p>
+<p>Finally, put the single trial dataframes into a list:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>dfList <span class="ot">&lt;-</span> <span class="fu">list</span>(df1, df2, df3, df4, df5)</span></code></pre></div>
 </div>
 <div id="run-main-wrapper-function" class="section level2">
-<h2>Run main wrapper function:</h2>
-<ol style="list-style-type: lower-alpha">
-<li>Not combining trials:</li>
-</ol>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>cates <span class="ot">&lt;-</span> CATEDisplays<span class="sc">::</span><span class="fu">displayCATE</span>(dfList,</span>
+<h2>3. Run main wrapper function:</h2>
+<div id="option-1-not-combining-trials" class="section level3">
+<h3>Option 1: Not combining trials</h3>
+<p>Here <a href>cateDisplay()</a> will estimate a casual forest and
+assess treatment effect heterogeneity separately for each single
+trial.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>catesDisplay <span class="ot">&lt;-</span> CATEDisplays<span class="sc">::</span><span class="fu">displayCATE</span>(dfList,</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                           <span class="at">outCol=</span><span class="st">&quot;outc&quot;</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                           <span class="at">txCol=</span><span class="st">&quot;tx&quot;</span>,</span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                           <span class="at">covList=</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;educ&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;ASIalc&quot;</span>),</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                           <span class="at">blpredList=</span><span class="cn">NULL</span>,</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                           <span class="at">combine=</span>F,</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                           <span class="at">ci=</span><span class="fl">0.95</span>, <span class="at">nTrees=</span><span class="dv">10000</span>, <span class="at">seedN=</span><span class="dv">7203</span>)</span></code></pre></div>
-<p>[1] “– 95% CI for the ATE: 0.041246 +/- 0.20325” [1] “Estimate:
--8.278 || Pr(&gt;t): 1” [1] “The
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                           <span class="at">verbose=</span>T,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>                           <span class="at">ci=</span><span class="fl">0.95</span>, <span class="at">nTrees=</span><span class="dv">10000</span>, <span class="at">seedN=</span><span class="dv">7203</span>)</span></code></pre></div>
+<p>[1] “– 95% CI for the ATE: -0.134315 +/- 0.184223” [1] “Estimate:
+-2.667 || Pr(&gt;t): 0.966” [1] “The
 <code>differential.forest.prediction</code> coefficient is not
 significantly greater than 0: we cannot reject the null of no
-heterogeneity.” [1] “– 95% CI for the ATE: 0.248275 +/- 0.839149” [1]
-“Estimate: -11.746 || Pr(&gt;t): 1” [1] “The
+heterogeneity.” [1] “– 95% CI for the ATE: -0.100775 +/- 0.47401” [1]
+“Estimate: -15.893 || Pr(&gt;t): 1” [1] “The
 <code>differential.forest.prediction</code> coefficient is not
 significantly greater than 0: we cannot reject the null of no
-heterogeneity.” [1] “– 95% CI for the ATE: -0.013391 +/- 0.162642” [1]
-“Estimate: -3.937 || Pr(&gt;t): 0.998” [1] “The
+heterogeneity.” [1] “– 95% CI for the ATE: -0.053472 +/- 0.14277” [1]
+“Estimate: 0.742 || Pr(&gt;t): 0.11” [1] “The
 <code>differential.forest.prediction</code> coefficient is not
 significantly greater than 0: we cannot reject the null of no
-heterogeneity.” [1] “– 95% CI for the ATE: -0.079917 +/- 0.147717” [1]
-“Estimate: 0.493 || Pr(&gt;t): 0.237” [1] “The
+heterogeneity.” [1] “– 95% CI for the ATE: -0.036537 +/- 0.157634” [1]
+“Estimate: -3.237 || Pr(&gt;t): 0.996” [1] “The
 <code>differential.forest.prediction</code> coefficient is not
 significantly greater than 0: we cannot reject the null of no
-heterogeneity.” [1] “– 95% CI for the ATE: 0.054667 +/- 0.260224” [1]
-“Estimate: -10.796 || Pr(&gt;t): 1” [1] “The
-<code>differential.forest.prediction</code> coefficient is not
-significantly greater than 0: we cannot reject the null of no
-heterogeneity.” Save figures with results:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;blpByStudy.pdf&quot;</span>, <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>BLP)</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;alltausByStudy.pdf&quot;</span>,  <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>TauHat)</span></code></pre></div>
-<p>NULL</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;tausBySubgroupAndStudy.pdf&quot;</span>,  <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>subgroupCATE)</span></code></pre></div>
-<p>[[1]]</p>
-<p>[[2]]</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
-</div>
-<div id="b.-combining-trials" class="section level1">
-<h1>b. Combining trials:</h1>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>cdfiffC <span class="ot">&lt;-</span> CATEDisplays<span class="sc">::</span><span class="fu">displayCATE</span>(dfList,</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>                                  <span class="at">outCol=</span><span class="st">&quot;outc&quot;</span>,</span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>                                  <span class="at">txCol=</span><span class="st">&quot;tx&quot;</span>,</span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>                                  <span class="at">covList=</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;educ&quot;</span>,</span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>                                             <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;ASIalc&quot;</span>),</span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>                                  <span class="at">blpredList=</span><span class="cn">NULL</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>                                  <span class="at">combine=</span>T,</span>
-<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>                                  <span class="at">ci=</span><span class="fl">0.95</span>, <span class="at">nTrees=</span><span class="dv">10000</span>, <span class="at">seedN=</span><span class="dv">7203</span>)</span></code></pre></div>
-<p>[1] “– 95% CI for the ATE: -0.007154 +/- 0.088261” [1] “Estimate:
-0.118 || Pr(&gt;t): 0.402” [1] “The
+heterogeneity.” [1] “– 95% CI for the ATE: 0.095326 +/- 0.247663” [1]
+“Estimate: -0.058 || Pr(&gt;t): 0.521” [1] “The
 <code>differential.forest.prediction</code> coefficient is not
 significantly greater than 0: we cannot reject the null of no
 heterogeneity.”</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;blpCombined.pdf&quot;</span>, <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>BLP)</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;alltausCombined.pdf&quot;</span>,  <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>TauHat)</span></code></pre></div>
-<p>NULL</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">pdf</span>(<span class="st">&quot;tausBySubgroupCombined.pdf&quot;</span>,  <span class="at">width=</span><span class="dv">10</span>, <span class="at">height=</span><span class="dv">6</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">print</span>(cates<span class="sc">$</span>subgroupCATE)</span></code></pre></div>
-<p>[[1]]</p>
+<p>Inspect output elements for a given study (say, study #2):</p>
+<p>ATE:</p>
+<pre><code>#&gt;   estimate    std.err 
+#&gt; -0.1007754  0.2418460</code></pre>
+<p>HTE test: “The p-value of the ‘differential.forest.prediction’
+coefficient also acts as an omnibus test for the presence of
+heterogeneity: If the coefficient is significantly greater than 0, then
+we can reject the null of no heterogeneity.” (see <a href="https://search.r-project.org/CRAN/refmans/grf/html/test_calibration.html">grf
+package documentation</a>)</p>
+<pre><code>#&gt; 
+#&gt; Best linear fit using forest predictions (on held-out data)
+#&gt; as well as the mean forest prediction as regressors, along
+#&gt; with one-sided heteroskedasticity-robust (HC3) SEs:
+#&gt; 
+#&gt;                                Estimate Std. Error t value Pr(&gt;t)
+#&gt; mean.forest.prediction           1.2186     1.0253  1.1886 0.1202
+#&gt; differential.forest.prediction -15.8933     2.2144 -7.1772 1.0000</code></pre>
+<p>Augmented dataset:</p>
+<pre><code>#&gt;   indID     race     educ    sex     tau.hat lowerinterval upperinterval
+#&gt; 1     1    White       HS   Male -0.08340999    -0.4977373     0.3309173
+#&gt; 2     2    Black  College   Male -0.10763178    -0.5219591     0.3066955
+#&gt; 3     3    Asian Graduate Female -0.02533602    -0.4396633     0.3889913
+#&gt; 4     4 Hispanic  College Female -0.12913305    -0.5434603     0.2851942
+#&gt; 5     5    Other       HS   Male -0.10683563    -0.5211629     0.3074916
+#&gt;            Y tx (Intercept)   age raceBlack raceHispanic raceOther raceWhite
+#&gt; 1  1.3530686  0           1 61.76         0            0         0         1
+#&gt; 2  0.3747627  0           1 49.56         1            0         0         0
+#&gt; 3 -0.4306161  1           1 35.26         0            0         0         0
+#&gt; 4  0.1190191  0           1 30.24         0            1         0         0
+#&gt; 5  0.6850489  0           1 25.33         0            0         1         0
+#&gt;   educGraduate educHS educLess than HS sexMale      ASIalc
+#&gt; 1            0      1                0       1 -0.24608705
+#&gt; 2            0      0                0       1 -0.03627714
+#&gt; 3            1      0                0       0  0.07794263
+#&gt; 4            0      0                0       0 -0.05765359
+#&gt; 5            0      1                0       1 -0.28095756</code></pre>
+<p>Best linear projection: “Let tau(Xi) = E[Y(1) - Y(0) | X = Xi] be the
+CATE, and Ai be a vector of user-provided covariates. This function
+provides a (doubly robust) fit to the linear model tau(Xi) ~ beta_0 + Ai
+* beta.” (see <a href="https://grf-labs.github.io/grf/reference/best_linear_projection.html">grf
+package documentation</a>)</p>
+<pre><code>#&gt; 
+#&gt; Best linear projection of the conditional average treatment effect.
+#&gt; Confidence intervals are cluster- and heteroskedasticity-robust (HC3):
+#&gt; 
+#&gt;                   Estimate Std. Error t value Pr(&gt;|t|)
+#&gt; (Intercept)      -0.497489   0.766840 -0.6488   0.5203
+#&gt; age               0.014724   0.014676  1.0032   0.3219
+#&gt; raceBlack        -0.068251   1.015000 -0.0672   0.9467
+#&gt; raceHispanic      0.741565   0.986563  0.7517   0.4568
+#&gt; raceOther        -0.114915   1.075093 -0.1069   0.9154
+#&gt; raceWhite         0.079019   0.880045  0.0898   0.9289
+#&gt; educGraduate     -0.711684   0.859354 -0.8282   0.4126
+#&gt; educHS           -0.969104   0.698573 -1.3873   0.1732
+#&gt; educLess.than.HS -0.371093   0.991454 -0.3743   0.7102
+#&gt; sexMale           0.383832   0.824177  0.4657   0.6440
+#&gt; ASIalc           -1.084591   1.529380 -0.7092   0.4824</code></pre>
+<p>Save figures with visualizations (for all studies):</p>
+<p>quartz_off_screen 2 [[1]]</p>
 <p>[[2]]</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
-<p>quartz_off_screen 2</p>
+<p>quartz_off_screen 2 quartz_off_screen 2</p>
+</div>
+<div id="option-2-combining-trials" class="section level3">
+<h3>Option 2: Combining trials</h3>
+<p>Here <a href>cateDisplay()</a> will first combine the data from
+all trials, and then estimate the CATE casual forest (including a study
+indicator) and assess treatment effect heterogeneity. As noted above,
+although technically not required, when merging data coming from
+multiple trials, it is highly recommended that the treatment and outcome
+have a similar meaning across studies.</p>
+<p>[1] “– 95% CI for the ATE: -0.049959 +/- 0.082564” [1] “Estimate:
+-0.917 || Pr(&gt;t): 0.927” [1] “The
+<code>differential.forest.prediction</code> coefficient is not
+significantly greater than 0: we cannot reject the null of no
+heterogeneity.”</p>
+<p>Again, we can inspect all the elements of the main output, and save
+resulting visuals.</p>
+<p>ATE:</p>
+<pre><code>#&gt;    estimate     std.err 
+#&gt; -0.04995945  0.04212521</code></pre>
+<p>HTE:</p>
+<pre><code>#&gt; 
+#&gt; Best linear fit using forest predictions (on held-out data)
+#&gt; as well as the mean forest prediction as regressors, along
+#&gt; with one-sided heteroskedasticity-robust (HC3) SEs:
+#&gt; 
+#&gt;                                Estimate Std. Error t value Pr(&gt;t)
+#&gt; mean.forest.prediction          0.98896    0.95682  1.0336 0.1508
+#&gt; differential.forest.prediction -0.91675    0.63122 -1.4523 0.9267</code></pre>
+<p>Augmented dataset:</p>
+<pre><code>#&gt;   indID   study  race         educ    sex     tau.hat lowerinterval
+#&gt; 1     1 Study 1 Other           HS Female -0.02698241    -0.2152834
+#&gt; 2     2 Study 1 White     Graduate   Male  0.04472005    -0.1033834
+#&gt; 3     3 Study 1 Other      College   Male -0.05063247    -0.2672534
+#&gt; 4     4 Study 1 Other Less than HS Female -0.18339746    -0.3767259
+#&gt; 5     5 Study 1 White Less than HS   Male  0.02617363    -0.1661701
+#&gt;   upperinterval          Y tx (Intercept) studyStudy2 studyStudy3 studyStudy4
+#&gt; 1   0.161318554 -0.4078516  1           1           0           0           0
+#&gt; 2   0.192823455  0.8948066  0           1           0           0           0
+#&gt; 3   0.165988499  0.4041582  0           1           0           0           0
+#&gt; 4   0.009931033  0.5534813  1           1           0           0           0
+#&gt; 5   0.218517366  1.2406471  0           1           0           0           0
+#&gt;   studyStudy5   age raceBlack raceHispanic raceOther raceWhite educGraduate
+#&gt; 1           0 39.79         0            0         1         0            0
+#&gt; 2           0 30.91         0            0         0         1            1
+#&gt; 3           0 50.05         0            0         1         0            0
+#&gt; 4           0 37.88         0            0         1         0            0
+#&gt; 5           0 20.00         0            0         0         1            0
+#&gt;   educHS educLess than HS sexMale      ASIalc
+#&gt; 1      1                0       0 -0.14092776
+#&gt; 2      0                0       1 -0.11917133
+#&gt; 3      0                0       1 -0.77182919
+#&gt; 4      0                1       0  0.39227555
+#&gt; 5      0                1       1 -0.02528334</code></pre>
+<p>Results from the best linear projection:</p>
+<pre><code>#&gt; 
+#&gt; Best linear projection of the conditional average treatment effect.
+#&gt; Confidence intervals are cluster- and heteroskedasticity-robust (HC3):
+#&gt; 
+#&gt;                    Estimate Std. Error t value Pr(&gt;|t|)  
+#&gt; (Intercept)       0.1233281  0.2228682  0.5534  0.58011  
+#&gt; studyStudy2       0.0691042  0.2105410  0.3282  0.74280  
+#&gt; studyStudy3       0.0810405  0.1285507  0.6304  0.52854  
+#&gt; studyStudy4       0.0781789  0.1359994  0.5748  0.56550  
+#&gt; studyStudy5       0.2606031  0.1568427  1.6616  0.09686 .
+#&gt; age              -0.0034091  0.0037193 -0.9166  0.35953  
+#&gt; raceBlack        -0.1019012  0.1345895 -0.7571  0.44912  
+#&gt; raceHispanic     -0.0059514  0.1457941 -0.0408  0.96745  
+#&gt; raceOther        -0.1272136  0.1377033 -0.9238  0.35576  
+#&gt; raceWhite        -0.1120201  0.1363658 -0.8215  0.41154  
+#&gt; educGraduate     -0.0061531  0.1150429 -0.0535  0.95735  
+#&gt; educHS           -0.1004966  0.1205597 -0.8336  0.40468  
+#&gt; educLess.than.HS -0.2048746  0.1158929 -1.7678  0.07734 .
+#&gt; sexMale          -0.0066821  0.0856488 -0.0780  0.93783  
+#&gt; ASIalc           -0.1203662  0.1322629 -0.9101  0.36297  
+#&gt; ---
+#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Save visuals:</p>
+<p>quartz_off_screen 2 [[1]]</p>
+<p>[[2]]</p>
+<p>quartz_off_screen 2 function (res, combine) { if (combine == F) {
+blpList &lt;- lapply(res, function(x) { x<span class="math inline">\(BLP  })  model.names &lt;-
+unlist(lapply(c(1:length(blpList)), function(i) {  paste0(&quot;Study
+&quot;, i)  }))  blps &lt;- jtools::plot_summs(blpList, point.shape =
+FALSE,  model.names = model.names)  dfg &lt;- blps\)</span>data dfg<span class="math inline">\(study &lt;- as.factor(dfg\)</span>model) dfg<span class="math inline">\(study &lt;- factor(dfg\)</span>study, levels =
+c(model.names)) ggBLP &lt;- ggplot2::ggplot(dfg, ggplot2::aes(x = study,
+y = estimate, color = term, group = term), ) + ggplot2::coord_flip() +
+ggplot2::geom_hline(yintercept = 0, linetype = “dashed”, color =
+“black”, size = 0.65) + ggplot2::geom_pointrange(position =
+ggplot2::position_dodge(width = 0.75), ggplot2::aes(ymin = conf.low,
+ymax = conf.high), alpha = 0.85) + ggplot2::ggtitle(“CATE best linear
+projection by Study and Covariate”) + theme_MH + ggplot2::xlab(““) +
+ggplot2::ylab(”“) + ggplot2::facet_wrap(~study, scales =”free”) +
+ggplot2::xlab(““) + ggplot2::theme(axis.text.y =
+ggplot2::element_blank(), ) } else { blpList &lt;- res<span class="math inline">\(BLP  blps &lt;- jtools::plot_summs(blpList,
+point.shape = FALSE)  dfg &lt;- blps\)</span>data dfg<span class="math inline">\(study &lt;- dfg\)</span>model ggBLP &lt;-
+ggplot2::ggplot(dfg, ggplot2::aes(x = study, y = estimate, color = term,
+group = term), ) + ggplot2::coord_flip() +
+ggplot2::geom_hline(yintercept = 0, linetype =”dashed”, color = “black”,
+size = 0.65) + ggplot2::geom_pointrange(position =
+ggplot2::position_dodge(width = 0.75), ggplot2::aes(ymin = conf.low,
+ymax = conf.high), alpha = 0.85) + ggplot2::ggtitle(“CATE best linear
+projection by Covariate”) + theme_MH + ggplot2::xlab(““) +
+ggplot2::ylab(”“) + ggplot2::theme(axis.text.y =
+ggplot2::element_blank(), ) } return(ggBLP) } &lt;bytecode:
+0x7ff4466bd070&gt; &lt;environment: namespace:CATEDisplays&gt;
+quartz_off_screen 2</p>
+</div>
 </div>
 
 

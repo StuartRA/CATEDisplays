@@ -34,7 +34,7 @@ The functions in this package are wrapped in the main function [displayCATE()]()
 
 1) Estimate the conditional average treatment effect (CATE) coming from one or more sites and/or trials
 2) Combine data from multiple trials (optionally).
-3) Test for the presence of treatment effect heterogeneity, using multiple diagnostics, including agnostic test for hetergeneity, distribution of the CATE by subgroups of interest with confidence intervals, and a doubly robust best linear projection of the CATE, provided user-specified covariates.
+3) Test for the presence of treatment effect heterogeneity, using multiple diagnostics, including agnostic test for heterogeneity (see ), distribution of the CATE by subgroups of interest with confidence intervals, and a doubly robust best linear projection of the CATE, provided user-specified covariates and/or predictors.
 4) Visualize results
 
 Overall, the procedure This package is mainly designed for researchers evaluating evidence coming from multiple trials and interested in inspecting potentially differential treatments effects across different subpopulations.
@@ -54,8 +54,8 @@ if(!require(devtools)){
     install.packages("devtools", repos = "http://cran.us.r-project.org")
 }
 
-if(!require(CATEDisplays )){
-    devtools::install_github("StuartRA/CATEDisplays ")
+if(!require(CATEDisplays)){
+devtools::install_github("StuartRA/CATEDisplays")
 }
 
 ```
@@ -66,7 +66,7 @@ And load the package by calling its library:
 library(CATEDisplays)
 ```
 
-Now let's generate a dataset for 5 trials that satisfies the following basic structure (required for the package to run seamlessly):
+Now let's generate a simple dataset for 5 trials that satisfies the following basic structure (required for the package to run seamlessly):
 
 1) One dataframe per study/trial, with varying sample sizes (250, 50, 450, 350, 150)
 2) If more than one study or trial is included, all the specified covariates of interest (e.g. demographics) must be available for each study/trial and coded in the same manner.
@@ -96,11 +96,11 @@ df5$sex <- as.factor(sample(c('Male', 'Female'), 150, replace=TRUE))
 Generate a continuous covariate ("Age"):
 
 ```{r, results='asis'}
-df1$Age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df2$Age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df3$Age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df4$Age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df5$Age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df1$age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df2$age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df3$age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df4$age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df5$age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
 ```
 Generate a categorical covariate ("Educational level"):
 ```{r, results='asis'}
@@ -173,25 +173,30 @@ catesDisplay <- CATEDisplays::displayCATE(dfList,
                            ci=0.95, nTrees=10000, seedN=7203)
 ```
 
-Inspect output elements:
+Inspect output elements for a given study (say, study #2):
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-cateOutput <- catesDisplay$cateOutput
-
-# ATE:
+studyNum = 2
+cateOutput <- catesDisplay$cateOutput[[studyNum]]
+```
+ATE:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 cateOutput$ATE
-
-# HTE:
+```
+HTE test: "The p-value of the 'differential.forest.prediction' coefficient also acts as an omnibus test for the presence of heterogeneity: If the coefficient is significantly greater than 0, then we can reject the null of no heterogeneity." (see [grf package documentation](https://search.r-project.org/CRAN/refmans/grf/html/test_calibration.html))
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 cateOutput$testHTE
-
-# Augmented dataset:
-cateOutput$cateDF
-
-# Best linear projection:
-jtools:summ(cateOutput$BLP)
+```
+Augmented dataset:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+head(cateOutput$cateDF, 5)
+```
+Best linear projection: "Let tau(Xi) = E[Y(1) - Y(0) | X = Xi] be the CATE, and Ai be a vector of user-provided covariates. This function provides a (doubly robust) fit to the linear model tau(Xi) ~ beta_0 + Ai * beta." (see [grf package documentation](https://grf-labs.github.io/grf/reference/best_linear_projection.html))
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput$BLP
 ```
 
-Save figures with visualizations:
+Save figures with visualizations (for all studies):
 
 ```{r, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -227,7 +232,31 @@ catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
                                   seedN=7203)
 ```
 
-Again, we can inspect the elements of the main output, and save resulting visuals.
+Again, we can inspect all the elements of the main output, and save resulting visuals.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput <- catesDisplayCombined$cateOutput
+```
+ATE:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput$ATE
+```
+HTE:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput$testHTE
+```
+
+Augmented dataset:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+head(cateOutput$cateDF, 5)
+```
+
+Results from the best linear projection:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput$BLP
+```
+
+Save visuals:
 
 ```{r, results='asis',echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -245,4 +274,3 @@ pdf("blpCombined.pdf", width=10, height=6)
 dev.off()
 
 ```
-

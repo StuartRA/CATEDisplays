@@ -11,9 +11,10 @@ if(!require(devtools)){
     install.packages("devtools", repos = "http://cran.us.r-project.org")
 }
 
-if(!require(CATEDisplays )){
-    devtools::install_github("StuartRA/CATEDisplays ")
-    }
+if(!require(CATEDisplays)){
+devtools::install_github("StuartRA/CATEDisplays")
+}
+
 
 ## -----------------------------------------------------------------------------
 library(CATEDisplays)
@@ -79,47 +80,86 @@ df5$tx <- sample(c(1, 0), 150, replace=TRUE, prob = c(0.45, 0.55))
 dfList <- list(df1, df2, df3, df4, df5)
 
 ## ---- results='asis'----------------------------------------------------------
-cates <- CATEDisplays::displayCATE(dfList,
+catesDisplay <- CATEDisplays::displayCATE(dfList,
                            outCol="outc",
                            txCol="tx",
                            covList= c("age", "race", "educ", "sex", "ASIalc"),
                            blpredList=NULL,
                            combine=F,
+                           verbose=T,
                            ci=0.95, nTrees=10000, seedN=7203)
 
-## ---- results='asis'----------------------------------------------------------
-pdf("blpByStudy.pdf", width=10, height=6)
-print(cates$BLP)
-dev.off()
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+studyNum = 2
+cateOutput <- catesDisplay$cateOutput[[studyNum]]
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$ATE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$testHTE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+head(cateOutput$cateDF, 5)
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$BLP
+
+## ---- results='asis', echo=FALSE, message=FALSE, warning=FALSE----------------
 
 pdf("alltausByStudy.pdf",  width=10, height=6)
-print(cates$TauHat)
+  print(catesDisplay$vizTauHat)
 dev.off()
 
 pdf("tausBySubgroupAndStudy.pdf",  width=10, height=6)
-print(cates$subgroupCATE)
+  print(catesDisplay$vizSubgroupCATE)
 dev.off()
 
-## ---- results='asis'----------------------------------------------------------
-cdfiffC <- CATEDisplays::displayCATE(dfList,
+pdf("blpByStudy.pdf", width=10, height=6)
+  print(catesDisplay$vizBLP)
+dev.off()
+
+## ---- results='asis',echo=FALSE, message=FALSE, warning=FALSE-----------------
+catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
                                   outCol="outc",
                                   txCol="tx",
                                   covList= c("age", "race", "educ",
                                              "sex", "ASIalc"),
                                   blpredList=NULL,
                                   combine=T,
-                                  ci=0.95, nTrees=10000, seedN=7203)
+                                  ci=0.95,
+                                  verbose=T,
+                                  nTrees=10000,
+                                  seedN=7203)
 
-pdf("blpCombined.pdf", width=10, height=6)
-print(cates$BLP)
-dev.off()
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput <- catesDisplayCombined$cateOutput
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$ATE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$testHTE
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+head(cateOutput$cateDF, 5)
+
+## ---- echo=FALSE, message=FALSE, warning=FALSE--------------------------------
+cateOutput$BLP
+
+## ---- results='asis',echo=FALSE, message=FALSE, warning=FALSE-----------------
 
 pdf("alltausCombined.pdf",  width=10, height=6)
-print(cates$TauHat)
+  print(catesDisplayCombined$vizTauHat)
 dev.off()
 
 pdf("tausBySubgroupCombined.pdf",  width=10, height=6)
-print(cates$subgroupCATE)
+  print(catesDisplayCombined$vizSubgroupCATE)
+dev.off()
+
+
+pdf("blpCombined.pdf", width=10, height=6)
+  print(catesDisplayCombined$vizBLP)
 dev.off()
 
 
