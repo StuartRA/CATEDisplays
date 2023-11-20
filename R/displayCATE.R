@@ -18,18 +18,23 @@ utils::globalVariables("dfList")
 #' @param ci numeric; confidence interval %
 #' @param nTrees numeric; column names of unit level variables  to sample units on
 #' @param seedN numeric; seed number to be used for sampling. If NA, calls set.seed(); default = NA
-#' @return list with: 1) , 2),  3)
+#' @return list with:
+#' 1) full output from getCATE(), 2) tauHat figures, 3) sub-group CATE figures, 4) best linear projection figures
 
 displayCATE <- function(dfList,
                       outCol,
                       txCol,
                       covList,
-                      blpredList=NULL,
-                      combine=FALSE,
-                      ci=0.95, nTrees=10000, seedN=7203){
+                      blpredList,
+                      combine,
+                      verbose,
+                      ci,
+                      nTrees,
+                      seedN){
 
   if(class(dfList) != "list"){
-    dfList <- as.list(dfList) }
+    dfList <- as.list(dfList)
+    }
 
   # 1. Run main function for each study:
 
@@ -51,18 +56,20 @@ displayCATE <- function(dfList,
                  covList,
                  blpredList,
                  combine,
-                 ci, nTrees,
+                 verbose,
+                 ci,
+                 nTrees,
                  seedN)
 
     dfviz <- res$CTN
     dfviz$study <- df$study
 
     # 2. Produce CATE estimates figures, all studies:
-    tauHat <- vizTauHat(dfviz, combine=T)
-    subgroupCATE <- subgroupCATE(dfviz, outCol, txCol, covList, combine=T)
+    vizTauHat <- vizTauHat(dfviz, combine=T)
+    vizSubgroupCATE <- subgroupCATE(dfviz, outCol, txCol, covList, combine=T)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blp <- vizBLP(res, combine=T)
+    vizblp <- vizBLP(res, combine=T)
 
   } else{
 
@@ -71,7 +78,9 @@ displayCATE <- function(dfList,
                                              covList,
                                              blpredList,
                                              combine,
-                                             ci, nTrees,
+                                             verbose,
+                                             ci,
+                                             nTrees,
                                              seedN)})
 
     df <- res[[1]]$CTN
@@ -87,15 +96,19 @@ displayCATE <- function(dfList,
     df[,txCol] <- df$tx
 
     # 2. Produce CATE estimates figures, all studies:
-    tauHat <- vizTauHat(df, combine=F)
-    subgroupCATE <- subgroupCATE(df, outCol, txCol, covList, combine=F)
+    vizTauHat <- vizTauHat(df, combine=F)
+    vizSubgroupCATE <- subgroupCATE(df, outCol, txCol, covList, combine=F)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blp <- vizBLP(res, combine=F)
+    vizBLP <- vizBLP(res, combine=F)
 
   }
 
-  return(list(cfOutput=res, tauHat=tauHat, subgroupCATE=subgroupCATE, BLP=blp)
+  return(list(cateOutput=res,
+              vizTauHat=vizTauHat,
+              vizSubgroupCATE=vizSubgroupCATE,
+              vizBLP=vizBLP
+              )
   )
 }
 

@@ -4,7 +4,18 @@
 \alias{getCATE}
 \title{getCATE}
 \usage{
-getCATE(stdf, outCol, txCol, covList, blpredList, combine, ci, nTrees, seedN)
+getCATE(
+  stdf,
+  outCol,
+  txCol,
+  covList,
+  blpredList,
+  combine,
+  verbose = TRUE,
+  ci = 0.95,
+  nTrees = 10000,
+  seedN = NA
+)
 }
 \arguments{
 \item{stdf}{dataframe; trial data (single study)}
@@ -15,18 +26,24 @@ getCATE(stdf, outCol, txCol, covList, blpredList, combine, ci, nTrees, seedN)
 
 \item{covList}{vector; column names of covariates to estimate forest}
 
-\item{blpredList}{vector;}
+\item{blpredList}{vector; column names of covariates to compute best linear projection; default=NULL (if NULL, same as covList)}
 
-\item{combine}{logical; combine data from multiple studies}
+\item{combine}{logical; combine data from multiple studies; default=FALSE}
 
-\item{ci}{numeric; confidence interval \%}
+\item{verbose}{logical; print ATE and heterogeneity test results; default=TRUE}
 
-\item{nTrees}{numeric; column names of unit level variables  to sample units on}
+\item{ci}{numeric; confidence interval \%; default=0.95}
 
-\item{seedN}{numeric; seed number to be used; default = NA}
+\item{nTrees}{numeric; number of trees in the causdal forest; default=10000}
+
+\item{seedN}{numeric; seed number to be used for reproducibility; default = NA}
 }
 \value{
-list with: 1) , 2),  3)
+list with:
+\enumerate{
+\item causal forest model; 2) ATE + CI; 3) heterogeneity test; 4) trial dataset augmented with CATE+CI;
+\item best linear projection model
+}
 }
 \description{
 Takes a dataset with data coming from one or more trials and: 1) Estimates the CATE \emph{/ using a causal forest model;

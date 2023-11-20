@@ -18,12 +18,15 @@ utils::globalVariables("qnorm")
 #' @param outCol character; name of outcome column
 #' @param txCol character; name of treatment status column
 #' @param covList vector; column names of covariates to estimate forest
-#' @param blpredList vector;
-#' @param combine logical; combine data from multiple studies
-#' @param ci numeric; confidence interval %
-#' @param nTrees numeric; column names of unit level variables  to sample units on
-#' @param seedN numeric; seed number to be used; default = NA
-#' @return list with: 1) , 2),  3)
+#' @param blpredList vector; column names of covariates to compute best linear projection; default=NULL (if NULL, same as covList)
+#' @param combine logical; combine data from multiple studies; default=FALSE
+#' @param verbose logical; print ATE and heterogeneity test results; default=TRUE
+#' @param ci numeric; confidence interval %; default=0.95
+#' @param nTrees numeric; number of trees in the causdal forest; default=10000
+#' @param seedN numeric; seed number to be used for reproducibility; default = NA
+#' @return list with:
+#' 1) causal forest model; 2) ATE + CI; 3) heterogeneity test; 4) trial dataset augmented with CATE+CI;
+#'  5) best linear projection model
 #'
 getCATE <- function(stdf,
                   outCol,
@@ -31,10 +34,14 @@ getCATE <- function(stdf,
                   covList,
                   blpredList,
                   combine,
-                  ci, nTrees,
-                  seedN){
+                  verbose=TRUE,
+                  ci=0.95,
+                  nTrees=10000,
+                  seedN=NA){
 
-      set.seed(seedN)
+      if(! is.na(seedN)){
+        set.seed(seedN)
+      }
 
       stdf <- as.data.frame(stdf)
       stdf <- sjlabelled::unlabel(stdf, verbose = FALSE)
@@ -73,23 +80,25 @@ getCATE <- function(stdf,
                            num.trees = nTrees,
                            )
 
+      # overall ATE:
       ATE = grf::average_treatment_effect(cf)
-      print(paste("-- 95% CI for the ATE:", round(ATE[1], 6),
-            "+/-", round(qnorm(ci + (1-ci)/2) * ATE[2], 6)))
-
-
       # tx heterogeneity (agnostic) test:
       testHTE <- grf::test_calibration(cf)
 
-      print(paste(
-                  "Estimate: ", round(testHTE[[2]],3), "||",
-                  "Pr(>t): ", round(testHTE[[8]], 3)
-      ))
+      if(verbose==TRUE){
+          print(paste("-- 95% CI for the ATE:", round(ATE[1], 6),
+                "+/-", round(qnorm(ci + (1-ci)/2) * ATE[2], 6)))
 
-      if(round(testHTE[[2]],3) > 0 & round(testHTE[[8]], 3) < 0.05){
-      print("The `differential.forest.prediction` coefficient is significantly greater than 0: we can reject the null of no heterogeneity.")
-      } else{
-        print("The `differential.forest.prediction` coefficient is not significantly greater than 0: we cannot reject the null of no heterogeneity.")
+          print(paste(
+                      "Estimate: ", round(testHTE[[2]],3), "||",
+                      "Pr(>t): ", round(testHTE[[8]], 3)
+          ))
+
+          if(round(testHTE[[2]],3) > 0 & round(testHTE[[8]], 3) < 0.05){
+          print("The `differential.forest.prediction` coefficient is significantly greater than 0: we can reject the null of no heterogeneity.")
+          } else{
+            print("The `differential.forest.prediction` coefficient is not significantly greater than 0: we cannot reject the null of no heterogeneity.")
+          }
       }
 
       #COMPARISON TABLES (tau>0 vs. tau <=0, t.test)
@@ -103,12 +112,12 @@ getCATE <- function(stdf,
 
 
       # data to do the subgroup descriptives (visuals):
-      CTN_output <- as.data.frame(cbind(tau.hat, lowerinterval,
+      cateDF <- as.data.frame(cbind(tau.hat, lowerinterval,
                                       upperinterval, Y, W, X))
-      CTN_output$indID <- as.factor(c(1:nrow(CTN_output)))
-      covList2 <- unlist(lapply(covList, function(x) {if(! x %in% colnames(CTN_output)){return(x)}}))
-      CTN_output <- dplyr::inner_join(dplyr::select(stdf, c("indID", covList2)),
-                              CTN_output, by = "indID")
+      cateDF$indID <- as.factor(c(1:nrow(cateDF)))
+      covList2 <- unlist(lapply(covList, function(x) {if(! x %in% colnames(cateDF)){return(x)}}))
+      cateDF <- dplyr::inner_join(dplyr::select(stdf, c("indID", covList2)),
+                              cateDF, by = "indID")
 
       # Best linear projection: we need the causal forest and covariate set for each study,
       #computed by the above, code for each corresponding dataset.
@@ -124,7 +133,7 @@ getCATE <- function(stdf,
       return(list(cf=cf,
                   ATE=ATE,
                   testHTE = testHTE,
-                  CTN=CTN_output,
+                  cateDF=cateDF,
                   BLP=blp)) # list with 5 elements
 }
 

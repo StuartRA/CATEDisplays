@@ -9,11 +9,12 @@ displayCATE(
   outCol,
   txCol,
   covList,
-  blpredList = NULL,
-  combine = FALSE,
-  ci = 0.95,
-  nTrees = 10000,
-  seedN = 7203
+  blpredList,
+  combine,
+  verbose,
+  ci,
+  nTrees,
+  seedN
 )
 }
 \arguments{
@@ -36,7 +37,10 @@ displayCATE(
 \item{seedN}{numeric; seed number to be used for sampling. If NA, calls set.seed(); default = NA}
 }
 \value{
-list with: 1) , 2),  3)
+list with:
+\enumerate{
+\item full output from getCATE(), 2) tauHat figures, 3) sub-group CATE figures, 4) best linear projection figures
+}
 }
 \description{
 Estimates CATE using causal forests with data from multiple trials

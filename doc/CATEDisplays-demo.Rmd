@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 
 ## Getting Started: Generating Data
 
-__Elena Badillo-Goicoechea, Robert Olsen, and Elizabeth A. Stuart__
+__Elena Badillo-Goicoechea, Ryoko Susukida, and Elizabeth A. Stuart__
 
 2023-11-19
 
-## Introduction
+## 1. Introduction
 
 Personalized treatment decisions, which hold great potential for improving health outcomes for patients of varying characteristics, involve the assessment and estimation of individualized or conditional treatment effects. 
 
@@ -45,9 +45,9 @@ To estimate causal forests and the best linear projection, CATEDisplays uses the
 This vignette will guide the reader, step-by-step, on CATEDisplays basic functionalities, with simulated datasets. Technical details on each of the package's main functions and on the sample dataset is included in the documentation, which the reader is encouraged to consult, if necessary.
 
 
-## Package and data set up
+## 2. Package and data set-up
 
-First, if needed, install the sitepickR package with the help of devtools:
+First, if needed, install the CATEDisplays package with the help of devtools:
 
 ```{r}
 if(!require(devtools)){
@@ -56,7 +56,8 @@ if(!require(devtools)){
 
 if(!require(CATEDisplays )){
     devtools::install_github("StuartRA/CATEDisplays ")
-    }
+}
+
 ```
 
 And load the package by calling its library:
@@ -65,9 +66,9 @@ And load the package by calling its library:
 library(CATEDisplays)
 ```
 
-Now let's generate a dataset that satisfies the following basic structure (required for the package to run seamlessly):
+Now let's generate a dataset for 5 trials that satisfies the following basic structure (required for the package to run seamlessly):
 
-1) One dataframe per study/trial
+1) One dataframe per study/trial, with varying sample sizes (250, 50, 450, 350, 150)
 2) If more than one study or trial is included, all the specified covariates of interest (e.g. demographics) must be available for each study/trial and coded in the same manner.
 3) Numerical outcome variable.
 
@@ -81,7 +82,9 @@ df3 <- data.frame(matrix(NA, nrow = 450, ncol = 1))
 df4 <- data.frame(matrix(NA, nrow = 350, ncol = 1))
 df5 <- data.frame(matrix(NA, nrow = 150, ncol = 1))
 ```
+
 Generate a categorical covariate ("Sex"):
+
 ```{r, results='asis'}
 df1$sex <- as.factor(sample(c('Male', 'Female'), 250, replace=TRUE))
 df2$sex <- as.factor(sample(c('Male', 'Female'), 50, replace=TRUE))
@@ -91,12 +94,13 @@ df5$sex <- as.factor(sample(c('Male', 'Female'), 150, replace=TRUE))
 ```
 
 Generate a continuous covariate ("Age"):
+
 ```{r, results='asis'}
-df1$age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df2$age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df3$age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df4$age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
-df5$age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df1$Age <- unlist(lapply(rnorm(250, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df2$Age <- unlist(lapply(rnorm(50, 30, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df3$Age <- unlist(lapply(rnorm(450, 25, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df4$Age <- unlist(lapply(rnorm(350, 20, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
+df5$Age <- unlist(lapply(rnorm(150, 40, 15), function (x) {max(sample(c(18:20)), round(x, 2))}))
 ```
 Generate a categorical covariate ("Educational level"):
 ```{r, results='asis'}
@@ -126,7 +130,7 @@ df4$ASIalc <- rnorm(350, 0, 0.25)
 df5$ASIalc <- rnorm(150, 0, 0.35)
 ```
 
-Generate continuous outcome variable:
+Generate a continuous outcome variable:
 
 ```{r, results='asis'}
 df1$outc <- rnorm(250, 0.6, 0.75)
@@ -136,7 +140,7 @@ df4$outc <- rnorm(350, 0.6, 0.75)
 df5$outc <- rnorm(150, 0.6, 0.75)
 ```
 
-Generate binary treatment assignment variable:
+Generate a binary treatment assignment variable:
 
 ```{r, results='asis'}
 df1$tx <- sample(c(1, 0), 250, replace=TRUE, prob = c(0.5, 0.5))
@@ -146,64 +150,98 @@ df4$tx <- sample(c(1, 0), 350, replace=TRUE, prob = c(0.5, 0.5))
 df5$tx <- sample(c(1, 0), 150, replace=TRUE, prob = c(0.45, 0.55))
 ```
 
-Put single trial dataframes into a list:
+Finally, put the single trial dataframes into a list:
 
 ```{r, results='asis'}
 dfList <- list(df1, df2, df3, df4, df5)
 ```
 
-## Run main wrapper function:
+## 3. Run main wrapper function:
 
- a. Not combining trials:
+### Option 1: Not combining trials
+
+Here [cateDisplay()]() will estimate a casual forest and assess treatment effect heterogeneity separately for each single trial.
  
 ```{r, results='asis'}
-cates <- CATEDisplays::displayCATE(dfList,
+catesDisplay <- CATEDisplays::displayCATE(dfList,
                            outCol="outc",
                            txCol="tx",
                            covList= c("age", "race", "educ", "sex", "ASIalc"),
                            blpredList=NULL,
                            combine=F,
+                           verbose=T,
                            ci=0.95, nTrees=10000, seedN=7203)
 ```
-Save figures with results:
 
-```{r, results='asis'}
-pdf("blpByStudy.pdf", width=10, height=6)
-print(cates$BLP)
-dev.off()
+Inspect output elements:
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cateOutput <- catesDisplay$cateOutput
+
+# ATE:
+cateOutput$ATE
+
+# HTE:
+cateOutput$testHTE
+
+# Augmented dataset:
+cateOutput$cateDF
+
+# Best linear projection:
+jtools:summ(cateOutput$BLP)
+```
+
+Save figures with visualizations:
+
+```{r, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
 
 pdf("alltausByStudy.pdf",  width=10, height=6)
-print(cates$TauHat)
+  print(catesDisplay$vizTauHat)
 dev.off()
 
 pdf("tausBySubgroupAndStudy.pdf",  width=10, height=6)
-print(cates$subgroupCATE)
+  print(catesDisplay$vizSubgroupCATE)
+dev.off()
+
+pdf("blpByStudy.pdf", width=10, height=6)
+  print(catesDisplay$vizBLP)
 dev.off()
 ```
 
 
-# b. Combining trials:
+### Option 2: Combining trials
 
-```{r, results='asis'}
-cdfiffC <- CATEDisplays::displayCATE(dfList,
+Here [cateDisplay()]() will first combine the data from all trials, and then estimate the CATE casual forest (including a study indicator) and assess treatment effect heterogeneity. As noted above, although technically not required, when merging data coming from multiple trials, it is highly recommended that the treatment and outcome have a similar meaning across studies.
+
+```{r, results='asis',echo=FALSE, message=FALSE, warning=FALSE}
+catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
                                   outCol="outc",
                                   txCol="tx",
                                   covList= c("age", "race", "educ",
                                              "sex", "ASIalc"),
                                   blpredList=NULL,
                                   combine=T,
-                                  ci=0.95, nTrees=10000, seedN=7203)
+                                  ci=0.95,
+                                  verbose=T,
+                                  nTrees=10000,
+                                  seedN=7203)
+```
 
-pdf("blpCombined.pdf", width=10, height=6)
-print(cates$BLP)
-dev.off()
+Again, we can inspect the elements of the main output, and save resulting visuals.
+
+```{r, results='asis',echo=FALSE, message=FALSE, warning=FALSE}
 
 pdf("alltausCombined.pdf",  width=10, height=6)
-print(cates$TauHat)
+  print(catesDisplayCombined$vizTauHat)
 dev.off()
 
 pdf("tausBySubgroupCombined.pdf",  width=10, height=6)
-print(cates$subgroupCATE)
+  print(catesDisplayCombined$vizSubgroupCATE)
+dev.off()
+
+
+pdf("blpCombined.pdf", width=10, height=6)
+  print(catesDisplayCombined$vizBLP)
 dev.off()
 
 ```
