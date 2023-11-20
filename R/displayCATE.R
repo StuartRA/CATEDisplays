@@ -62,7 +62,7 @@ displayCATE <- function(dfList,
     subgroupCATE <- subgroupCATE(dfviz, outCol, txCol, covList, combine=T)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blpF <- vizBLP(res, combine=T)
+    blp <- vizBLP(res, combine=T)
 
   } else{
 
@@ -91,11 +91,11 @@ displayCATE <- function(dfList,
     subgroupCATE <- subgroupCATE(df, outCol, txCol, covList, combine=F)
 
     # 3. Produce figure for best linear projection  results, all studies:
-    blpF <- vizBLP(res, combine=F)
+    blp <- vizBLP(res, combine=F)
 
   }
 
-  return(list(res, tauHat, subgroupCATE, blpF)
+  return(list(cfOutput=res, tauHat=tauHat, subgroupCATE=subgroupCATE, BLP=blp)
   )
 }
 
