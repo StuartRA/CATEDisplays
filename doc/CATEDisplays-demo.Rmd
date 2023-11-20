@@ -9,7 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 options(rmarkdown.html_vignette.check_title = FALSE)
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, fig.width=8, fig.height=5) 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, fig.width=10, fig.height=5) 
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>"
@@ -30,7 +30,7 @@ However, using data to make these decisions in a reliable, precise, and generali
 
 CATEDisplays is designed to quickly estimate the conditional average treatment effect from one or more trials, and provide descriptive and formal diagnostics to assess the presence of treatment effect heterogeneity.
 
-The functions in this package are wrapped in the main function [displayCATE()]() but can run separately. These let the user seamlessly: 
+The functions in this package are wrapped in the main function [displayCATE()]() but can be run separately. Together, these let the user seamlessly: 
 
 1) Estimate the conditional average treatment effect (CATE) coming from one or more sites and/or trials
 2) Combine data from multiple trials (optionally).
@@ -175,42 +175,43 @@ catesDisplay <- CATEDisplays::displayCATE(dfList,
 
 Inspect output elements for a given study (say, study #2):
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 studyNum = 2
 cateOutput <- catesDisplay$cateOutput[[studyNum]]
 ```
 ATE:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput$ATE
 ```
 HTE test: "The p-value of the 'differential.forest.prediction' coefficient also acts as an omnibus test for the presence of heterogeneity: If the coefficient is significantly greater than 0, then we can reject the null of no heterogeneity." (see [grf package documentation](https://search.r-project.org/CRAN/refmans/grf/html/test_calibration.html))
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 cateOutput$testHTE
 ```
+
 Augmented dataset:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 head(cateOutput$cateDF, 5)
 ```
 Best linear projection: "Let tau(Xi) = E[Y(1) - Y(0) | X = Xi] be the CATE, and Ai be a vector of user-provided covariates. This function provides a (doubly robust) fit to the linear model tau(Xi) ~ beta_0 + Ai * beta." (see [grf package documentation](https://grf-labs.github.io/grf/reference/best_linear_projection.html))
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput$BLP
 ```
 
-Save figures with visualizations (for all studies):
+CATE visualizations (all studies):
 
-```{r, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
+1. Overall CATE estimates:
+```{r, results='asis',  message=FALSE, warning=FALSE}
+catesDisplay$vizTauHat
+```
 
-pdf("alltausByStudy.pdf",  width=10, height=6)
-  print(catesDisplay$vizTauHat)
-dev.off()
+2. CATE estimates by subgroup and study:
+```{r, results='asis',  message=FALSE, warning=FALSE, fig.height=7, fig.width=10}
+catesDisplay$vizSubgroupCATE
+```
 
-pdf("tausBySubgroupAndStudy.pdf",  width=10, height=6)
-  print(catesDisplay$vizSubgroupCATE)
-dev.off()
-
-pdf("blpByStudy.pdf", width=10, height=6)
-  print(catesDisplay$vizBLP)
-dev.off()
+3. Best linear projection:
+```{r, results='asis',  message=FALSE, warning=FALSE}
+catesDisplay$vizBLP
 ```
 
 
@@ -218,7 +219,7 @@ dev.off()
 
 Here [cateDisplay()]() will first combine the data from all trials, and then estimate the CATE casual forest (including a study indicator) and assess treatment effect heterogeneity. As noted above, although technically not required, when merging data coming from multiple trials, it is highly recommended that the treatment and outcome have a similar meaning across studies.
 
-```{r, results='asis',echo=FALSE, message=FALSE, warning=FALSE}
+```{r, results='asis', message=FALSE, warning=FALSE}
 catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
                                   outCol="outc",
                                   txCol="tx",
@@ -234,43 +235,47 @@ catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
 
 Again, we can inspect all the elements of the main output, and save resulting visuals.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput <- catesDisplayCombined$cateOutput
 ```
 ATE:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput$ATE
 ```
 HTE:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput$testHTE
 ```
 
 Augmented dataset:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 head(cateOutput$cateDF, 5)
 ```
 
 Results from the best linear projection:
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r,  message=FALSE, warning=FALSE}
 cateOutput$BLP
 ```
 
-Save visuals:
+See visuals (combined studies):
 
-```{r, results='asis',echo=FALSE, message=FALSE, warning=FALSE}
+CATE visualizations (all studies):
 
-pdf("alltausCombined.pdf",  width=10, height=6)
-  print(catesDisplayCombined$vizTauHat)
-dev.off()
-
-pdf("tausBySubgroupCombined.pdf",  width=10, height=6)
-  print(catesDisplayCombined$vizSubgroupCATE)
-dev.off()
-
-
-pdf("blpCombined.pdf", width=10, height=6)
-  print(catesDisplayCombined$vizBLP)
-dev.off()
-
+1. Overall CATE estimates:
+```{r, results='asis',  message=FALSE, warning=FALSE,  fig.height=6, fig.width=10}
+catesDisplayCombined$vizTauHat
 ```
+
+2. CATE estimates by subgroup:
+```{r, results='asis',  message=FALSE, warning=FALSE,  fig.height=6, fig.width=10}
+catesDisplayCombined$vizSubgroupCATE
+```
+
+3. BLP (here we are opting for using the [vizBLP]() function directly over the getCATE output object, instead):
+```{r, results='asis',  message=FALSE, warning=FALSE,  fig.height=12, fig.width=12}
+vizBLP(cateOutput, combine=T)
+```
+
+
+
+
