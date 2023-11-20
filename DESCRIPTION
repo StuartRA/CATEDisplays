@@ -11,7 +11,7 @@ Authors@R: c(
            comment = c(ORCID = ""))
   )
 Description: CATEDisplays is an R package designed to seamlessly: 1) estimate conditional average treatment effect (CATE) coming from one or more sites and/or trials; 2) test for treatment effect heterogeneity; 3) visualize results. This package is mainly designed for researchers evaluating evidence coming from multiple trials and interested in potentially differential treatments effects across different subpopulations.
-Imports: grf, dplyr, ggplot2, stats, jtools, sjlabelled, plyr, data.table, cowplot
+Imports: grf, dplyr, ggplot2, broom, broom.mixed, reshape2, stats, jtools, sjlabelled, plyr, data.table
 License: GPL (>=3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
