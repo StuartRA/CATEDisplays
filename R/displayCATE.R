@@ -33,6 +33,7 @@ displayCATE <- function(dfList,
                       seedN){
 
   if(class(dfList) != "list"){
+
     dfList <- as.list(dfList)
     }
 
@@ -61,7 +62,7 @@ displayCATE <- function(dfList,
                  nTrees,
                  seedN)
 
-    dfviz <- res$CTN
+    dfviz <- res$cateDF
     dfviz$study <- df$study
 
     # 2. Produce CATE estimates figures, all studies:
@@ -83,11 +84,11 @@ displayCATE <- function(dfList,
                                              nTrees,
                                              seedN)})
 
-    df <- res[[1]]$CTN
+    df <- res[[1]]$cateDF
     df$study <- as.factor(paste0("Study ", 1))
 
     for(i in 2:length(dfList)){
-      dfi <- res[[i]]$CTN
+      dfi <- res[[i]]$cateDF
       dfi$study <- as.factor(paste0("Study ", i))
       df <- plyr::rbind.fill(df, dfi)
     }
