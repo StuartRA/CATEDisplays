@@ -14,7 +14,8 @@ getCATE(
   verbose = TRUE,
   ci = 0.95,
   nTrees = 10000,
-  seedN = NA
+  seedN = NA,
+  i = NA
 )
 }
 \arguments{

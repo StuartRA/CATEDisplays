@@ -16,8 +16,8 @@ utils::globalVariables("dfList")
 #' @param blpredList vector; number of units to be initially randomly selected
 #' @param combine logical; combine data from multiple studies
 #' @param ci numeric; confidence interval %
-#' @param nTrees numeric; column names of unit level variables  to sample units on
-#' @param seedN numeric; seed number to be used for sampling. If NA, calls set.seed(); default = NA
+#' @param nTrees numeric; number of trees in the causal forest; default=10000
+#' @param seedN numeric; seed number to be used for reproducibility; default = NA
 #' @return list with:
 #' 1) full output from getCATE(), 2) tauHat figures, 3) sub-group CATE figures, 4) best linear projection figures
 
@@ -30,7 +30,7 @@ displayCATE <- function(dfList,
                       verbose,
                       ci,
                       nTrees,
-                      seedN){
+                      seedN=NA){
 
   if(class(dfList) != "list"){
 
@@ -74,7 +74,8 @@ displayCATE <- function(dfList,
 
   } else{
 
-    res <- lapply(dfList, function(x) {getCATE(x, outCol,
+    res <- lapply(as.list(c(1:length(dfList))
+                          ), function(i) {getCATE(dfList[[i]], outCol,
                                              txCol,
                                              covList,
                                              blpredList,
@@ -82,7 +83,8 @@ displayCATE <- function(dfList,
                                              verbose,
                                              ci,
                                              nTrees,
-                                             seedN)})
+                                             seedN,
+                                             i)})
 
     df <- res[[1]]$cateDF
     df$study <- as.factor(paste0("Study ", 1))

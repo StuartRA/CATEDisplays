@@ -22,7 +22,7 @@ utils::globalVariables("qnorm")
 #' @param combine logical; combine data from multiple studies; default=FALSE
 #' @param verbose logical; print ATE and heterogeneity test results; default=TRUE
 #' @param ci numeric; confidence interval %; default=0.95
-#' @param nTrees numeric; number of trees in the causdal forest; default=10000
+#' @param nTrees numeric; number of trees in the causal forest; default=10000
 #' @param seedN numeric; seed number to be used for reproducibility; default = NA
 #' @return list with:
 #' 1) causal forest model; 2) ATE + CI; 3) heterogeneity test; 4) trial dataset augmented with CATE+CI;
@@ -37,7 +37,7 @@ getCATE <- function(stdf,
                   verbose=TRUE,
                   ci=0.95,
                   nTrees=10000,
-                  seedN=NA){
+                  seedN=NA, i=NA){
 
       if(! is.na(seedN)){
         set.seed(seedN)
@@ -63,6 +63,7 @@ getCATE <- function(stdf,
 
       if(combine==T){
         covList <- c("study", covList)
+        i = "All"
       }
 
       fm <- stats::as.formula(paste("~ 1 +", paste(covList, collapse= "+")))
@@ -71,7 +72,7 @@ getCATE <- function(stdf,
       Y.forest = grf::regression_forest(X , Y)
       Y.hat = stats::predict (Y.forest)$predictions
       W.forest = grf::regression_forest (X , W)
-      W.hat = stats::predict(W.forest )$ predictions
+      W.hat = stats::predict(W.forest )$predictions
 
       # causal forest:
       cf = grf::causal_forest(X=X,
@@ -86,6 +87,8 @@ getCATE <- function(stdf,
       testHTE <- grf::test_calibration(cf)
 
       if(verbose==TRUE){
+          print(paste("Study: ", as.character(i)))
+
           print(paste("-- 95% CI for the ATE:", round(ATE[1], 6),
                 "+/-", round(qnorm(ci + (1-ci)/2) * ATE[2], 6)))
 
@@ -95,9 +98,9 @@ getCATE <- function(stdf,
           ))
 
           if(round(testHTE[[2]],3) > 0 & round(testHTE[[8]], 3) < 0.05){
-          print("The `differential.forest.prediction` coefficient is significantly greater than 0: we can reject the null of no heterogeneity.")
+          print("The `differential.forest.prediction` coefficient is significantly > 0: we can reject the null of no heterogeneity.")
           } else{
-            print("The `differential.forest.prediction` coefficient is not significantly greater than 0: we cannot reject the null of no heterogeneity.")
+            print("The `differential.forest.prediction` coefficient is not significantly > 0: we cannot reject the null of no heterogeneity.")
           }
       }
 

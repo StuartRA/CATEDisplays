@@ -163,14 +163,17 @@ dfList <- list(df1, df2, df3, df4, df5)
 Here [cateDisplay()]() will estimate a casual forest and assess treatment effect heterogeneity separately for each single trial.
  
 ```{r, results='asis'}
-catesDisplay <- CATEDisplays::displayCATE(dfList,
+catesDisplay <- CATEDisplays::displayCATE(
+                           dfList=dfList,
                            outCol="outc",
                            txCol="tx",
                            covList= c("age", "race", "educ", "sex", "ASIalc"),
                            blpredList=NULL,
                            combine=F,
                            verbose=T,
-                           ci=0.95, nTrees=10000, seedN=7203)
+                           ci=0.95,
+                           nTrees=1000,
+                           seedN=NA)
 ```
 
 Inspect output elements for a given study (say, study #2):
@@ -211,7 +214,7 @@ catesDisplay$vizSubgroupCATE
 
 3. Best linear projection:
 ```{r, results='asis',  message=FALSE, warning=FALSE}
-catesDisplay$vizBLP
+catesDisplay$vizblp
 ```
 
 
@@ -220,7 +223,8 @@ catesDisplay$vizBLP
 Here [cateDisplay()]() will first combine the data from all trials, and then estimate the CATE casual forest (including a study indicator) and assess treatment effect heterogeneity. As noted above, although technically not required, when merging data coming from multiple trials, it is highly recommended that the treatment and outcome have a similar meaning across studies.
 
 ```{r, results='asis', message=FALSE, warning=FALSE}
-catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
+catesDisplayCombined <- CATEDisplays::displayCATE(
+                                  dfList=dfList,
                                   outCol="outc",
                                   txCol="tx",
                                   covList= c("age", "race", "educ",
@@ -230,7 +234,7 @@ catesDisplayCombined <- CATEDisplays::displayCATE(dfList,
                                   ci=0.95,
                                   verbose=T,
                                   nTrees=10000,
-                                  seedN=7203)
+                                  seedN=NA)
 ```
 
 Again, we can inspect all the elements of the main output, and save resulting visuals.
